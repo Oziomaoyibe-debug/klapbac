@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Klapbac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0A;--card:#151515;--line:#262626;--text:#F5F5F5;--mute:#A3A3A3;--pink:#FF3D6E;--pink-d:#E02A5A}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;font-size:16px;line-height:1.45}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 80px}
+header{position:sticky;top:0;z-index:5;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:24px;letter-spacing:-1px}
+.brand svg{width:34px;height:34px}
+.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:500}
+.btn.primary{background:var(--pink);border-color:var(--pink);color:#0A0A0A;font-weight:700}
+.btn.primary:hover{background:var(--pink-d)}
+.btn:disabled{opacity:.5;cursor:default}
+h1{font-size:34px;line-height:1.1;letter-spacing:-1.5px;margin:32px 0 8px}
+.sub{color:var(--mute);margin:0 0 24px}
+.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tabs .btn{flex:1}
+.tabs .btn[aria-selected="true"]{background:var(--text);color:#0A0A0A;border-color:var(--text);font-weight:700}
+label{display:block;font-weight:500;margin:14px 0 6px}
+input,select,textarea{width:100%;min-height:48px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+textarea{min-height:96px;resize:vertical}
+.msg{margin:14px 0 0;padding:12px 14px;border-radius:12px;background:#2A1017;border:1px solid #5A1E30;color:#FFB4C6}
+.msg.ok{background:#0F2A18;border-color:#1E5A33;color:#B4FFD0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:16px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+.count{color:var(--mute);font-size:14px}
+.post .meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin-bottom:6px}
+.post .name{font-weight:700}
+.post .school{color:var(--pink);font-size:14px}
+.post .time{color:var(--mute);font-size:14px}
+.post p{margin:0 0 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.actions{display:flex;gap:8px}
+.like{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.like[aria-pressed="true"]{border-color:var(--pink);color:var(--pink)}
+.link{background:none;border:0;color:var(--mute);cursor:pointer;min-height:44px;padding:0 10px;text-decoration:underline}
+.empty{color:var(--mute);text-align:center;padding:40px 0}
+.rules{color:var(--mute);font-size:14px;margin:0}
+.cbox{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.cmt{margin:0 0 12px}.cmt p{margin:2px 0;overflow-wrap:anywhere}.cmt .time{color:var(--mute);font-size:13px}
+.cform{display:flex;gap:8px}.cform input{flex:1}
+dialog{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:16px;max-width:480px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+footer .wrap{padding-bottom:40px}
+.hint{color:var(--mute);font-size:14px;margin:6px 0 0}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.btn,.like{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand">
+    <svg viewBox="0 0 100 100" role="img" aria-label="Klapbac logo"><path d="M72 28 A32 32 0 1 0 72 72" fill="none" stroke="#FF3D6E" stroke-width="14" stroke-linecap="round"/><circle cx="50" cy="50" r="8" fill="#F5F5F5"/></svg>
+    <span>klapbac</span>
+  </div>
+  <button class="btn" id="logoutBtn" hidden>Log out</button>
+</div></header>
+
+<main class="wrap">
+  <section id="authView" hidden>
+    <h1>Say it. Loud.</h1>
+    <p class="sub">The student voice, out loud. Sign up with your email and pick a username.</p>
+    <div class="tabs" role="tablist">
+      <button class="btn" role="tab" id="tabSignup" aria-selected="true">Sign up</button>
+      <button class="btn" role="tab" id="tabLogin" aria-selected="false">Log in</button>
+    </div>
+    <div id="authForm">
+      <div id="signupOnly">
+        <label for="username">Username</label>
+        <input id="username" autocomplete="username" maxlength="20" placeholder="e.g. campus_voice">
+        <p class="hint">3 to 20 characters. Letters, numbers and underscores only, no spaces. Example: Ozioma_Creator</p>
+        <label for="school">Your school</label>
+        <select id="school"></select>
+        <input id="otherSchool" maxlength="80" placeholder="Type your school's name" hidden style="margin-top:8px">
+      </div>
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+      <div id="authMsg" class="msg" hidden role="alert"></div>
+      <p style="margin-top:20px"><button class="btn primary" id="authBtn" style="width:100%">Create account</button></p>
+    </div>
+  </section>
+
+  <section id="appView" hidden>
+    <div class="card">
+      <label for="body" style="margin-top:0">What's happening on campus?</label>
+      <textarea id="body" maxlength="500" placeholder="Tell us what's on your mind..."></textarea>
+      <div class="row">
+        <span class="count" id="count">0 / 500</span>
+        <button class="btn primary" id="postBtn">Post</button>
+      </div>
+      <div id="postMsg" class="msg" hidden role="alert"></div>
+    </div>
+    <p class="rules">Campus gist, funny moments, tough days, all of it. Say it your way.</p>
+    <div id="feed" aria-live="polite"></div>
+  </section>
+</main>
+
+<footer><div class="wrap"><button class="link" id="termsBtn" type="button">Terms and guidelines</button><button class="link" id="blockedBtn" type="button" hidden>Blocked users</button></div></footer>
+<dialog id="dlg"><div id="dlgBody"></div><p style="text-align:right;margin-bottom:0"><button class="btn" id="dlgClose" type="button">Close</button></p></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://gmbjodvbyfuuoyqstwca.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_YtMEQhPhhxliNFkRztUutA_l7vLhhpv';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = (id) => document.getElementById(id);
+let me = null;
+let mode = 'signup';
+let timer = null;
+
+function show(el, text, ok) {
+  el.textContent = text;
+  el.hidden = !text;
+  el.classList.toggle('ok', !!ok);
+}
+
+function ago(iso) {
+  const s = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+
+function setMode(m) {
+  mode = m;
+  $('tabSignup').setAttribute('aria-selected', m === 'signup');
+  $('tabLogin').setAttribute('aria-selected', m === 'login');
+  $('signupOnly').hidden = m !== 'signup';
+  $('authBtn').textContent = m === 'signup' ? 'Create account' : 'Log in';
+  $('password').autocomplete = m === 'signup' ? 'new-password' : 'current-password';
+  show($('authMsg'), '');
+}
+
+async function submitAuth() {
+  const email = $('email').value.trim();
+  const password = $('password').value;
+  const msg = $('authMsg');
+  show(msg, '');
+  if (!email || password.length < 8) return show(msg, 'Enter your email and a password of at least 8 characters.');
+  $('authBtn').disabled = true;
+  try {
+    if (mode === 'signup') {
+      const username = $('username').value.trim();
+      let school = $('school').value;
+      if (school === '__other') school = $('otherSchool').value.trim();
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) return show(msg, 'Username must be 3 to 20 characters: letters, numbers or underscores only, no spaces. Example: Ozioma_Creator');
+      if (school.length < 2) return show(msg, 'Select your school, or type its name.');
+      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { username, school } } });
+      if (error) return show(msg, /database/i.test(error.message) ? 'That username is taken. Try another.' : error.message);
+      if (!data.session) show(msg, 'Account created. Check your email to confirm, then log in.', true);
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) return show(msg, 'Wrong email or password.');
+    }
+  } catch (e) {
+    show(msg, 'Network problem. Check your connection and try again.');
+  } finally {
+    $('authBtn').disabled = false;
+  }
+}
+
+function el(tag, props, kids) {
+  const n = document.createElement(tag);
+  Object.assign(n, props || {});
+  (kids || []).forEach((k) => n.append(k));
+  return n;
+}
+
+
+const SCHOOLS = [
+'Abubakar Tafawa Balewa University, Bauchi (ATBU)','Ahmadu Bello University, Zaria (ABU)','Bayero University, Kano (BUK)',
+'Federal University of Technology, Akure (FUTA)','Federal University of Technology, Minna (FUTMINNA)','Federal University of Technology, Owerri (FUTO)',
+'Federal University, Oye-Ekiti (FUOYE)','Federal University, Lokoja','Federal University, Lafia','Federal University, Dutse','Federal University, Gusau',
+'Federal University, Kashere','Federal University, Wukari','Federal University, Birnin Kebbi','Federal University, Dutsin-Ma','Federal University, Otuoke',
+'Federal University, Ndufu-Alike Ikwo (FUNAI)','Federal University, Gashua','Federal University of Agriculture, Abeokuta (FUNAAB)',
+'Federal University of Agriculture, Makurdi (FUAM)','Michael Okpara University of Agriculture, Umudike (MOUAU)',
+'Federal University of Petroleum Resources, Effurun (FUPRE)','Nnamdi Azikiwe University, Awka (UNIZIK)','Obafemi Awolowo University, Ile-Ife (OAU)',
+'University of Abuja (UNIABUJA)','University of Benin (UNIBEN)','University of Calabar (UNICAL)','University of Ibadan (UI)','University of Ilorin (UNILORIN)',
+'University of Jos (UNIJOS)','University of Lagos (UNILAG)','University of Maiduguri (UNIMAID)','University of Nigeria, Nsukka (UNN)',
+'University of Port Harcourt (UNIPORT)','University of Uyo (UNIUYO)','Usmanu Danfodiyo University, Sokoto (UDUSOK)','Modibbo Adama University, Yola',
+'Nigerian Defence Academy, Kaduna','National Open University of Nigeria (NOUN)',
+'Lagos State University (LASU)','Lagos State University of Science and Technology (LASUSTECH)','Olabisi Onabanjo University, Ago-Iwoye (OOU)',
+'Ambrose Alli University, Ekpoma (AAU)','Delta State University, Abraka (DELSU)','Rivers State University','Enugu State University of Science and Technology (ESUT)',
+'Abia State University, Uturu (ABSU)','Imo State University, Owerri (IMSU)','Ebonyi State University, Abakaliki (EBSU)',
+'Chukwuemeka Odumegwu Ojukwu University, Uli (COOU)','Akwa Ibom State University (AKSU)','Cross River University of Technology (CRUTECH)',
+'Benue State University, Makurdi (BSU)','Prince Abubakar Audu University, Anyigba','Kwara State University, Malete (KWASU)','Ekiti State University, Ado-Ekiti (EKSU)',
+'Osun State University (UNIOSUN)','Ladoke Akintola University of Technology, Ogbomoso (LAUTECH)','Adekunle Ajasin University, Akungba (AAUA)',
+'Tai Solarin University of Education, Ijagun','Niger Delta University, Yenagoa (NDU)','Edo State University, Iyamho (EDSU)','Plateau State University, Bokkos',
+'Nasarawa State University, Keffi (NSUK)','Kaduna State University (KASU)','Yusuf Maitama Sule University, Kano','Sokoto State University','Bauchi State University, Gadau',
+'Gombe State University','Taraba State University, Jalingo','Ibrahim Badamasi Babangida University, Lapai (IBBU)','Kebbi State University of Science and Technology, Aliero',
+'Covenant University, Ota','Babcock University, Ilishan-Remo','Afe Babalola University, Ado-Ekiti (ABUAD)','Bowen University, Iwo','Redeemer\'s University, Ede',
+'Landmark University, Omu-Aran','Pan-Atlantic University, Lagos','American University of Nigeria, Yola (AUN)','Nile University of Nigeria, Abuja','Baze University, Abuja',
+'Bells University of Technology, Ota','Crawford University, Igbesa','Lead City University, Ibadan','Madonna University, Okija','Caleb University, Imota',
+'Veritas University, Abuja','Godfrey Okoye University, Enugu','Igbinedion University, Okada','Benson Idahosa University, Benin City','Wesley University, Ondo',
+'Achievers University, Owo','Ajayi Crowther University, Oyo','Augustine University, Ilara-Epe','Joseph Ayo Babalola University, Ikeji-Arakeji',
+'Mountain Top University, Ogun','Elizade University, Ilara-Mokin','Chrisland University, Abeokuta','Southwestern University, Okun-Owa','McPherson University, Seriki Sotayo',
+'Hallmark University, Ijebu-Itele','Oduduwa University, Ipetumodu','Rhema University, Aba','Salem University, Lokoja','Kings University, Odeomu','Novena University, Ogume',
+'Paul University, Awka','Tansian University, Umunya','Evangel University, Akaeze','Gregory University, Uturu','Samuel Adegboyega University, Ogwa','Fountain University, Osogbo',
+'Al-Hikmah University, Ilorin','Summit University, Offa','Anchor University, Lagos','Dominion University, Ibadan','Trinity University, Yaba','Thomas Adewumi University, Oko-Irese',
+'Admiralty University of Nigeria, Ibusa','Eko University of Medicine and Health Sciences','Wellspring University, Benin City','PAMO University of Medical Sciences, Port Harcourt',
+'Arthur Jarvis University, Akpabuyo','Clifford University, Owerrinta','Coal City University, Enugu','Bingham University, Karu','Skyline University, Kano','Kola Daisi University, Ibadan',
+'Precious Cornerstone University, Ibadan','Ahman Pategi University','Edwin Clark University, Kiagbodo','Maranatha University, Lagos','Nigerian British University, Asa',
+'Christopher University, Mowe','Mudiame University, Irrua','Greenfield University, Kasarami','Karl-Kumm University, Vom','Jewel University, Gombe','Lux Mundi University, Umuahia'
+];
+function fillSchools() {
+  const sel = $('school');
+  const list = Array.from(new Set(SCHOOLS)).sort((a, b) => a.localeCompare(b));
+  sel.append(el('option', { value: '', textContent: 'Select your school' }));
+  list.forEach((n) => sel.append(el('option', { value: n, textContent: n })));
+  sel.append(el('option', { value: '__other', textContent: 'My school is not listed' }));
+  sel.onchange = () => { $('otherSchool').hidden = sel.value !== '__other'; };
+}
+
+let blocked = new Set();
+async function loadBlocks() {
+  const { data } = await sb.from('blocks').select('blocked_id');
+  blocked = new Set((data || []).map((r) => r.blocked_id));
+}
+function openDlg(nodes) { $('dlgBody').replaceChildren(...nodes); $('dlg').showModal(); }
+
+function reportDlg(target) {
+  const sel = el('select');
+  ['Harassment or bullying', 'Threat or violence', 'Hate or discrimination', 'False information', 'Spam', 'Other']
+    .forEach((r) => sel.append(el('option', { value: r, textContent: r })));
+  const msg = el('div', { className: 'msg', hidden: true });
+  const send = el('button', { className: 'btn primary', type: 'button', textContent: 'Send report' });
+  send.onclick = async () => {
+    send.disabled = true;
+    const { error } = await sb.from('reports').insert({ ...target, reason: sel.value });
+    if (error) { show(msg, 'Could not send: ' + error.message); send.disabled = false; return; }
+    show(msg, 'Thanks. Your report was sent.', true);
+  };
+  openDlg([el('h2', { textContent: 'Report', style: 'margin-top:0' }), el('label', { textContent: 'Why are you reporting this?' }), sel, msg, el('p', {}, [send])]);
+}
+
+async function openComments(p, box) {
+  box.replaceChildren(el('p', { className: 'count', textContent: 'Loading...' }));
+  const { data, error } = await sb.from('comments')
+    .select('id, body, created_at, user_id, profiles(username)')
+    .eq('post_id', p.id).order('created_at', { ascending: true });
+  box.replaceChildren();
+  if (error) return box.append(el('p', { className: 'count', textContent: 'Could not load comments: ' + error.message }));
+  (data || []).filter((c) => !blocked.has(c.user_id)).forEach((c) => {
+    const row = el('div', { className: 'cmt' }, [
+      el('b', { textContent: (c.profiles && c.profiles.username) || 'student' }),
+      document.createTextNode(' '),
+      el('span', { className: 'time', textContent: ago(c.created_at) }),
+      el('p', { textContent: c.body })
+    ]);
+    if (c.user_id === me.id) {
+      const d = el('button', { className: 'link', type: 'button', textContent: 'Delete' });
+      d.onclick = async () => { await sb.from('comments').delete().eq('id', c.id); loadFeed(); };
+      row.append(d);
+    } else {
+      const r = el('button', { className: 'link', type: 'button', textContent: 'Report' });
+      r.onclick = () => reportDlg({ comment_id: c.id });
+      row.append(r);
+    }
+    box.append(row);
+  });
+  const input = el('input', { maxLength: 300, placeholder: 'Write a comment...', ariaLabel: 'Comment' });
+  const go = el('button', { className: 'btn primary', type: 'button', textContent: 'Reply' });
+  go.onclick = async () => {
+    const body = input.value.trim();
+    if (!body) return;
+    go.disabled = true;
+    const { error: e } = await sb.from('comments').insert({ post_id: p.id, body });
+    go.disabled = false;
+    if (e) return alert('Could not comment: ' + e.message);
+    openComments(p, box);
+  };
+  box.append(el('div', { className: 'cform' }, [input, go]));
+}
+
+async function showBlocked() {
+  const { data } = await sb.from('blocks').select('blocked_id, profiles!blocks_blocked_id_fkey(username)');
+  const nodes = [el('h2', { textContent: 'Blocked users', style: 'margin-top:0' })];
+  if (!data || !data.length) nodes.push(el('p', { className: 'count', textContent: 'You have not blocked anyone.' }));
+  (data || []).forEach((r) => {
+    const b = el('button', { className: 'btn', type: 'button', textContent: 'Unblock' });
+    b.onclick = async () => {
+      await sb.from('blocks').delete().eq('blocked_id', r.blocked_id).eq('blocker_id', me.id);
+      $('dlg').close(); loadFeed();
+    };
+    nodes.push(el('div', { className: 'row' }, [el('span', { textContent: (r.profiles && r.profiles.username) || 'user' }), b]));
+  });
+  openDlg(nodes);
+}
+
+function showTerms() {
+  openDlg([
+    el('h2', { textContent: 'Terms and guidelines', style: 'margin-top:0' }),
+    el('p', { textContent: 'Klapbac is for students to talk about campus life: the fun, the funny and the frustrating.' }),
+    el('p', { textContent: 'Do not post threats, harassment, hate, other people\'s private details, or things you know are false. Posts and accounts that break these rules can be removed.' }),
+    el('p', { textContent: 'Use Report on anything that worries you, and Block to stop seeing someone. We never show your email to other users.' }),
+    el('p', { className: 'count', textContent: 'Draft guidelines. Full terms and privacy policy coming soon.' })
+  ]);
+}
+$('dlgClose').onclick = () => $('dlg').close();
+$('termsBtn').onclick = showTerms;
+$('blockedBtn').onclick = showBlocked;
+
+function renderPost(p) {
+  const likes = p.likes || [];
+  const liked = likes.some((l) => l.user_id === me.id);
+  const prof = p.profiles || {};
+  const meta = el('div', { className: 'meta' }, [
+    el('span', { className: 'name', textContent: prof.username || 'student' }),
+    el('span', { className: 'school', textContent: prof.school || '' }),
+    el('span', { className: 'time', textContent: ago(p.created_at) })
+  ]);
+  const likeBtn = el('button', { className: 'like', type: 'button', ariaLabel: 'Like' }, [
+    document.createTextNode((liked ? '♥ ' : '♡ ') + likes.length)
+  ]);
+  likeBtn.setAttribute('aria-pressed', liked);
+  likeBtn.onclick = async () => {
+    likeBtn.disabled = true;
+    if (liked) await sb.from('likes').delete().eq('post_id', p.id).eq('user_id', me.id);
+    else await sb.from('likes').insert({ post_id: p.id });
+    loadFeed();
+  };
+  const nC = (p.comments && p.comments[0] && p.comments[0].count) || 0;
+  const cBtn = el('button', { className: 'like', type: 'button' }, [document.createTextNode('💬 ' + nC)]);
+  const cbox = el('div', { className: 'cbox', hidden: true });
+  cBtn.onclick = () => { cbox.hidden = !cbox.hidden; if (!cbox.hidden) openComments(p, cbox); };
+  const actions = el('div', { className: 'actions' }, [likeBtn, cBtn]);
+  if (p.user_id === me.id) {
+    const del = el('button', { className: 'link', type: 'button', textContent: 'Delete' });
+    del.onclick = async () => {
+      if (!confirm('Delete this post?')) return;
+      await sb.from('posts').delete().eq('id', p.id);
+      loadFeed();
+    };
+    actions.append(del);
+  } else {
+    const rep = el('button', { className: 'link', type: 'button', textContent: 'Report' });
+    rep.onclick = () => reportDlg({ post_id: p.id });
+    const blk = el('button', { className: 'link', type: 'button', textContent: 'Block' });
+    blk.onclick = async () => {
+      if (!confirm('Block ' + (prof.username || 'this user') + '? You will no longer see their posts.')) return;
+      await sb.from('blocks').insert({ blocked_id: p.user_id });
+      loadFeed();
+    };
+    actions.append(rep, blk);
+  }
+  return el('article', { className: 'card post' }, [meta, el('p', { textContent: p.body }), actions, cbox]);
+}
+
+async function loadFeed() {
+  if (!me) return;
+  await loadBlocks();
+  const { data, error } = await sb.from('posts')
+    .select('id, body, created_at, user_id, profiles(username, school), likes(user_id), comments(count)')
+    .order('created_at', { ascending: false }).limit(50);
+  const feed = $('feed');
+  feed.replaceChildren();
+  if (error) return feed.append(el('p', { className: 'empty', textContent: 'Could not load posts: ' + error.message }));
+  const shown = data.filter((p) => !blocked.has(p.user_id));
+  if (!shown.length) return feed.append(el('p', { className: 'empty', textContent: 'No posts yet. Be the first to say something.' }));
+  shown.forEach((p) => feed.append(renderPost(p)));
+}
+
+async function publish() {
+  const body = $('body').value.trim();
+  const msg = $('postMsg');
+  show(msg, '');
+  if (!body) return show(msg, 'Write something first.');
+  $('postBtn').disabled = true;
+  $('postBtn').textContent = 'Posting...';
+  const { error } = await sb.from('posts').insert({ body });
+  $('postBtn').disabled = false;
+  $('postBtn').textContent = 'Post';
+  if (error) return show(msg, 'Could not post: ' + error.message);
+  $('body').value = '';
+  $('count').textContent = '0 / 500';
+  show(msg, 'Posted!', true);
+  setTimeout(() => show(msg, ''), 2500);
+  await loadFeed();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function render(session) {
+  me = session ? session.user : null;
+  $('authView').hidden = !!me;
+  $('appView').hidden = !me;
+  $('logoutBtn').hidden = !me;
+  $('blockedBtn').hidden = !me;
+  clearInterval(timer);
+  if (me) { loadFeed(); timer = setInterval(loadFeed, 30000); }
+}
+
+$('username').addEventListener('input', () => { $('username').value = $('username').value.replace(/\s+/g, '_').replace(/[^A-Za-z0-9_]/g, ''); });
+$('tabSignup').onclick = () => setMode('signup');
+$('tabLogin').onclick = () => setMode('login');
+$('authBtn').onclick = submitAuth;
+$('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAuth(); });
+$('postBtn').onclick = publish;
+$('body').addEventListener('input', () => { $('count').textContent = $('body').value.length + ' / 500'; });
+$('logoutBtn').onclick = () => sb.auth.signOut();
+
+fillSchools();
+sb.auth.onAuthStateChange((_event, session) => render(session));
+sb.auth.getSession().then(({ data }) => render(data.session));
+</script>
+</body>
+</html>
